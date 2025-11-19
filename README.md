@@ -53,32 +53,90 @@ endmodule
 
 
 # Test Bench
+module ripple_adder_tb;
+    reg [3:0] A, B;
+    reg Cin;
+    wire [3:0] Sum;
+    wire Cout;
+
+    ripple_adder_task dut (
+        .A(A), .B(B), .Cin(Cin), .Sum(Sum), .Cout(Cout)
+    );
+
+    initial begin
+        $monitor("Time=%0t | A=%b B=%b Cin=%b | Sum=%b Cout=%b", 
+                  $time, A, B, Cin, Sum, Cout);
+
+        A = 4'b0011; B = 4'b0010; Cin = 1'b0;
+        #10;
+
+        A = 4'b0111; B = 4'b0101; Cin = 1'b0;
+        #10;
+
+        A = 4'b1010; B = 4'b0110; Cin = 1'b1;
+        #10;
+
+        A = 4'b1111; B = 4'b1111; Cin = 1'b0;
+        #10;
+
+        $finish;
+    end
+endmodule
 
 # Output Waveform
 
+<img width="704" height="520" alt="image" src="https://github.com/user-attachments/assets/d7df001f-34bf-4ca7-a566-57e4ee33f82e" />
+
 # 4 bit Ripple counter using Function
-// 4-bit Ripple Counter using Function
 module ripple_counter_func (
     input clk, rst,
     output reg [3:0] Q
 );
-
-    function [3:0] count;
-     ///
+    function [3:0] count (input [3:0] current_q);
+        count = current_q + 1;
     endfunction
 
     always @(posedge clk or posedge rst) begin
         if (rst)
             Q <= 4'b0000;
         else
-            Q <= count(Q);  // use function to increment
+            Q <= count(Q);
     end
 endmodule
 
 # Test Bench
+module ripple_counter_tb;
+    reg clk, rst;
+    wire [3:0] Q;
+
+    ripple_counter_func dut (
+        .clk(clk), .rst(rst), .Q(Q)
+    );
+
+    initial begin
+        clk = 0;
+        forever #5 clk = ~clk;
+    end
+
+    initial begin
+        $monitor("Time=%0t | rst=%b | Q=%d", $time, rst, Q);
+        
+        rst = 1;
+        #15;
+
+        rst = 0;
+        
+        #180;
+
+        $finish;
+    end
+endmodule
 
 
 # Output Waveform 
+
+<img width="708" height="519" alt="image" src="https://github.com/user-attachments/assets/81dc145c-79ec-438a-b65e-0aea45e583fe" />
+
 
 
 # Conclusion
